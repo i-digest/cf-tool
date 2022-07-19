@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.cftool.cftool.model.LogMessages;
 import org.cftool.cftool.model.SshCommand;
 import org.cftool.cftool.model.exception.RuntimeInterruptedException;
+import org.springframework.lang.NonNull;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -14,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class UbuntuOperationSystemService extends LinuxOperationSystemService {
 
-    public UbuntuOperationSystemService(final String address, final int port) throws JSchException {
+    public UbuntuOperationSystemService(@NonNull final String address, final int port) throws JSchException {
         super(address, port);
     }
 
@@ -27,6 +28,19 @@ public class UbuntuOperationSystemService extends LinuxOperationSystemService {
             return waitUntilSystemReboot(16);
         } else {
             return false;
+        }
+    }
+
+    @Override
+    public boolean upgradeSystemPackages() {
+        return getSshClient().executeCommand(SshCommand.SYSTEM_FORCE_UPGRADE);
+    }
+
+    private void safeSleep(final int seconds) {
+        try {
+            TimeUnit.SECONDS.sleep(seconds);
+        } catch (InterruptedException e) {
+            throw new RuntimeInterruptedException(e);
         }
     }
 
@@ -44,19 +58,6 @@ public class UbuntuOperationSystemService extends LinuxOperationSystemService {
                 log.error(LogMessages.SYSTEM_REBOOT_TOOK_TO_LONG_MESSAGE);
                 return false;
             }
-        }
-    }
-
-    @Override
-    public boolean upgradeSystemPackages() {
-        return getSshClient().executeCommand(SshCommand.SYSTEM_FORCE_UPGRADE);
-    }
-
-    private void safeSleep(final int seconds) {
-        try {
-            TimeUnit.SECONDS.sleep(seconds);
-        } catch (InterruptedException e) {
-            throw new RuntimeInterruptedException(e);
         }
     }
 }

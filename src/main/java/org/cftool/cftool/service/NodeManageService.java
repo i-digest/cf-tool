@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.cftool.cftool.configuration.NodeConfigurationLoader;
 import org.cftool.cftool.model.LogMessages;
 import org.cftool.cftool.model.Node;
+import org.cftool.cftool.model.OperationSystem;
+import org.cftool.cftool.model.OperationSystemCredentials;
 import org.cftool.cftool.model.cloudflare.Host;
 import org.cftool.cftool.model.exception.RuntimeInterruptedException;
 import org.springframework.lang.NonNull;
@@ -30,7 +32,8 @@ public class NodeManageService {
         final Node node = nodeConfigurationLoader.getNodeAddress(nodeName);
         if (node != null) {
             try {
-                final OperationSystemService operationSystemService = new UbuntuOperationSystemService(node.getNodeAddress(), DEFAULT_SSH_PORT);
+                final OperationSystemCredentials credentials = getCredentials(node.getNodeAddress());
+                final OperationSystemService operationSystemService = OperationSystemService.getService(OperationSystem.UBUNTU, credentials);
                 final boolean rebooted = operationSystemService.rebootSystem();
                 if (rebooted) {
                     log.info(LogMessages.HOSTS_SUCCESSFULLY_REBOOTED_MESSAGE, nodeName);
@@ -50,7 +53,8 @@ public class NodeManageService {
         final Node node = nodeConfigurationLoader.getNodeAddress(nodeName);
         if (node != null) {
             try {
-                final OperationSystemService operationSystemService = new UbuntuOperationSystemService(node.getNodeAddress(), DEFAULT_SSH_PORT);
+                final OperationSystemCredentials credentials = getCredentials(node.getNodeAddress());
+                final OperationSystemService operationSystemService = OperationSystemService.getService(OperationSystem.UBUNTU, credentials);
                 log.info("Starting package upgrading on node {}", nodeName);
                 final boolean upgraded = operationSystemService.upgradeSystemPackages();
                 if (upgraded) {
@@ -136,7 +140,8 @@ public class NodeManageService {
 
     @SneakyThrows
     private void upgradeSystemPackagesAndReboot(final Node node, final String nodeName, final String hostId) throws JSchException {
-        final OperationSystemService operationSystemService = new UbuntuOperationSystemService(node.getNodeAddress(), DEFAULT_SSH_PORT);
+        final OperationSystemCredentials credentials = getCredentials(node.getNodeAddress());
+        final OperationSystemService operationSystemService = OperationSystemService.getService(OperationSystem.UBUNTU, credentials);
         log.info("Starting package upgrading on node {}", nodeName);
         final boolean upgraded = operationSystemService.upgradeSystemPackages();
         if (upgraded) {
@@ -152,5 +157,12 @@ public class NodeManageService {
         } else {
             log.error(LogMessages.SYSTEM_PACKAGES_FAILED_TO_UPGRADED_MESSAGE, nodeName);
         }
+    }
+
+    private OperationSystemCredentials getCredentials(final String address) {
+        return OperationSystemCredentials.builder()
+                .address(address)
+                .port(DEFAULT_SSH_PORT)
+                .build();
     }
 }
