@@ -27,7 +27,7 @@
             <AppenderRef ref="RollingFile"/>
         </Root>
 
-        <Logger name="org.sample.cftool" level="info"/>
+        <Logger name="org.cftool.cftool" level="info"/>
     </Loggers>
 
 </Configuration>
