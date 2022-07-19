@@ -48,8 +48,7 @@ public class Main implements CommandLineRunner {
             try {
                 for (final String arg : args) {
                     if (!arg.contains("=") || !arg.startsWith("--")) {
-                        System.out.println("Wrong command: '" + arg + "'");
-                        writeHelpAndCloseApp();
+                        throw new UnknownCommandException("Wrong command: '" + arg + "'");
                     } else {
                         final String[] split = arg.split("=");
 

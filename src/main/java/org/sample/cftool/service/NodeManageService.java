@@ -4,7 +4,6 @@ import com.jcraft.jsch.JSchException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.sample.cftool.configuration.NodeConfigurationLoader;
-import org.sample.cftool.model.LogMessages;
 import org.sample.cftool.model.Node;
 import org.sample.cftool.model.cloudflare.Host;
 import org.sample.cftool.model.exception.RuntimeInterruptedException;
@@ -12,6 +11,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
+import static org.sample.cftool.model.LogMessages.*;
 
 @Slf4j
 @Component
@@ -33,15 +34,15 @@ public class NodeManageService {
                 final OperationSystemService operationSystemService = new UbuntuOperationSystemService(node.getNodeAddress(), DEFAULT_SSH_PORT);
                 final boolean rebooted = operationSystemService.rebootSystem();
                 if (rebooted) {
-                    log.info("Node {} successfully rebooted", nodeName);
+                    log.info(HOSTS_SUCCESSFULLY_REBOOTED_MESSAGE, nodeName);
                 } else {
-                    log.info("Node {} failed to reboot", nodeName);
+                    log.info(HOSTS_FAILED_TO_REBOOT_MESSAGE, nodeName);
                 }
             } catch (final JSchException e) {
-                log.error(LogMessages.ERROR_DURING_EXECUTION_SSH_COMMAND_MESSAGE, nodeName);
+                log.error(ERROR_DURING_EXECUTION_SSH_COMMAND_MESSAGE, nodeName);
             }
         } else {
-            log.error(LogMessages.HOST_NOT_FOUND_IN_CONFIGURATION_FILE_MESSAGE, nodeName);
+            log.error(HOST_NOT_FOUND_IN_CONFIGURATION_FILE_MESSAGE, nodeName);
         }
     }
 
@@ -54,15 +55,15 @@ public class NodeManageService {
                 log.info("Starting package upgrading on node {}", nodeName);
                 final boolean upgraded = operationSystemService.upgradeSystemPackages();
                 if (upgraded) {
-                    log.info("System packages successfully upgraded on node {}", nodeName);
+                    log.info(SYSTEM_PACKAGES_SUCCESSFULLY_UPGRADED_MESSAGE, nodeName);
                 } else {
-                    log.error("Error occurs during system package upgrading on node {}", nodeName);
+                    log.error(SYSTEM_PACKAGES_FAILED_TO_UPGRADED_MESSAGE, nodeName);
                 }
             } catch (final JSchException e) {
-                log.error(LogMessages.ERROR_DURING_EXECUTION_SSH_COMMAND_MESSAGE, nodeName);
+                log.error(ERROR_DURING_EXECUTION_SSH_COMMAND_MESSAGE, nodeName);
             }
         } else {
-            log.error(LogMessages.HOST_NOT_FOUND_IN_CONFIGURATION_FILE_MESSAGE, nodeName);
+            log.error(HOST_NOT_FOUND_IN_CONFIGURATION_FILE_MESSAGE, nodeName);
         }
     }
 
@@ -77,7 +78,7 @@ public class NodeManageService {
                 log.error("Host with name {} not found in cloudstack service", nodeName);
             }
         } else {
-            log.error(LogMessages.HOST_NOT_FOUND_IN_CONFIGURATION_FILE_MESSAGE, nodeName);
+            log.error(HOST_NOT_FOUND_IN_CONFIGURATION_FILE_MESSAGE, nodeName);
         }
     }
 
@@ -92,7 +93,7 @@ public class NodeManageService {
                 log.error("Host with name {} not found in cloudstack service", nodeName);
             }
         } else {
-            log.error(LogMessages.HOST_NOT_FOUND_IN_CONFIGURATION_FILE_MESSAGE, nodeName);
+            log.error(HOST_NOT_FOUND_IN_CONFIGURATION_FILE_MESSAGE, nodeName);
         }
     }
 
@@ -117,11 +118,11 @@ public class NodeManageService {
                         throw new RuntimeInterruptedException(e);
                     }
                 } else {
-                    log.error(LogMessages.HOST_NOT_FOUND_IN_CONFIGURATION_FILE_MESSAGE, nodeName);
+                    log.error(HOST_NOT_FOUND_IN_CONFIGURATION_FILE_MESSAGE, nodeName);
                 }
             });
         } else {
-            log.error(LogMessages.HOSTS_NOT_FOUND_IN_CONFIGURATION_FILE_MESSAGE);
+            log.error(HOSTS_NOT_FOUND_IN_CONFIGURATION_FILE_MESSAGE);
         }
     }
 
@@ -130,7 +131,7 @@ public class NodeManageService {
         try {
             upgradeSystemPackagesAndReboot(node, nodeName, hostId);
         } catch (final JSchException e) {
-            log.error(LogMessages.ERROR_DURING_EXECUTION_SSH_COMMAND_MESSAGE, nodeName);
+            log.error(ERROR_DURING_EXECUTION_SSH_COMMAND_MESSAGE, nodeName);
         }
     }
 
@@ -140,17 +141,17 @@ public class NodeManageService {
         log.info("Starting package upgrading on node {}", nodeName);
         final boolean upgraded = operationSystemService.upgradeSystemPackages();
         if (upgraded) {
-            log.info("System packages successfully upgraded on node {}", nodeName);
+            log.info(SYSTEM_PACKAGES_SUCCESSFULLY_UPGRADED_MESSAGE, nodeName);
             log.info("Rebooting node {}", nodeName);
             final boolean rebooted = operationSystemService.rebootSystem();
             if (rebooted) {
-                log.info("Node {} successfully rebooted", nodeName);
+                log.info(HOSTS_SUCCESSFULLY_REBOOTED_MESSAGE, nodeName);
                 cloudstackService.disableMaintenanceMode(hostId, nodeName);
             } else {
-                log.info("Node {} failed to reboot", nodeName);
+                log.info(HOSTS_FAILED_TO_REBOOT_MESSAGE, nodeName);
             }
         } else {
-            log.error("Error occurs during system package upgrading on node {}", nodeName);
+            log.error(SYSTEM_PACKAGES_FAILED_TO_UPGRADED_MESSAGE, nodeName);
         }
     }
 }
