@@ -1,0 +1,25 @@
+spring:
+  main:
+    banner-mode: off
+  session:
+    store-type: none
+  profiles:
+    active: default
+
+sample:
+  path:
+    config:
+      hosts: /etc/hosts
+      cmk: /root/.cmk/config
+      ssh:
+        remote_user: root
+        known_hosts: /root/.ssh/known_hosts
+        private_key: /root/.ssh/id_rsa
+
+logging:
+  level:
+    org.sample.cftool: info
+
+server:
+  error:
+    include-stacktrace: never
