@@ -10,7 +10,7 @@ CF-tool is a Java library for to automatically update system packages on virtual
 CF-tool can be used with a single bundle or smaller fine-grained jars. The bundle contains all jars that must be included in classpath.
 The big bundle is named:
 
-    cf-tool-${jline.version}.jar
+    cf-tool-${cf-tool.version}.jar
 
 The dependencies are minimal: you may use CF-tool without any dependency on *nix.
 
